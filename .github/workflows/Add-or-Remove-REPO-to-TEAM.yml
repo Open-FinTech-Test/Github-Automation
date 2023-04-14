@@ -2,7 +2,7 @@ name: Add or Remove REPO to TEAM
 on:
   push:
     paths:
-      - ../../Add-or-Remove-REPO-to-TEAM.csv
+      - Add-or-Remove-REPO-to-TEAM.csv
 env:
   ORG_NAME: ${{ secrets.ORGANIZATION }}
 jobs:
