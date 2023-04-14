@@ -20,7 +20,7 @@ jobs:
 
       - name: Assign or remove users to TEAM 
         run: |
-          IFS=',' read -r ACTION TEAM_NAME < <(head -n 1 users.csv)
+          IFS=',' read -r ACTION TEAM_NAME < <(head -n 1 Add-or-Remove-User-to-TEAM.csv)
           echo "Action: $ACTION"
           echo "team name: $TEAM_NAME"
           
@@ -37,12 +37,12 @@ jobs:
               -H "Authorization: Bearer ${{ secrets.ORG_ADMIN_TOKEN }}" \
               "https://api.github.com/orgs/${{ env.ORG_NAME }}/teams/$TEAM_NAME/memberships/$USERNAME" \
               --data '{"role": "'$ROLE'"}'
-            done < <(tail -n +2 users.csv)
+            done < <(tail -n +2 Add-or-Remove-User-to-TEAM.csv)
             
           elif [ $ACTION == "remove-user" ]; then
            while IFS=',' read -r USERNAME ROLE || [ -n "$USERNAME" ]; do
              curl -X DELETE -H "Authorization: Bearer ${{ secrets.ORG_ADMIN_TOKEN }} " -s "https://api.github.com/orgs/${{ env.ORG_NAME }}/teams/$TEAM_NAME/memberships/$USERNAME" 
-           done < <(tail -n +2 users.csv)  
+           done < <(tail -n +2 Add-or-Remove-User-to-TEAM.csv)  
             
           fi
           
@@ -50,6 +50,6 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: user-roles-csv
-          path: users.csv
+          path: Add-or-Remove-User-to-TEAM.csv
           
         
