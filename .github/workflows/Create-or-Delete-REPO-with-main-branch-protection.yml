@@ -1,7 +1,7 @@
 name: Create Repo With Readme And Protection
 
 on:
-  push:
+#  push:
     branches: [ main ]
 
 env:
@@ -18,7 +18,7 @@ jobs:
       - name: Create Repository with branch protection
         run: |     
 
-          IFS=',' read -r ACTION < <(head -n 1 repos.csv)
+          IFS=',' read -r ACTION < <(head -n 1 Create-or-Delete-REPO-with-main-branch-protection.csv)
           echo "Action: $ACTION"
 
           if [ $ACTION == "create-repo" ]; then
@@ -51,12 +51,12 @@ jobs:
               }, 
               "restrictions": null
               }'             
-            done < <(tail -n +2 repos.csv)
+            done < <(tail -n +2 Create-or-Delete-REPO-with-main-branch-protection.csv)
             
           elif [ $ACTION == "delete-repo" ]; then
            while IFS=',' read -r REPO_NAME VISIBILITY || [ -n "$REPO_NAME" ]; do
              curl -X DELETE -H "Authorization: token ${{ secrets.ORG_ADMIN_TOKEN }}" "https://api.github.com/repos/${{ env.ORG_NAME }}/$REPO_NAME"
-           done < <(tail -n +2 repos.csv)  
+           done < <(tail -n +2 Create-or-Delete-REPO-with-main-branch-protection.csv)  
             
           fi   
             
@@ -64,7 +64,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: repos-csv
-          path: repos.csv    
+          path: Create-or-Delete-REPO-with-main-branch-protection.csv    
           
           
 #          IFS=',' read -r ACTION < <(head -n 1 repos.csv)
