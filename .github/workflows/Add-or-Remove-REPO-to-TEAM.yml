@@ -1,8 +1,8 @@
 name: REPO to a TEAM
 on:
   push:
-    branches:
-      - main
+    paths:
+      - ../../Add-or-Remove-REPO-to-TEAM.csv
 env:
   ORG_NAME: ${{ secrets.ORGANIZATION }}
 jobs:
