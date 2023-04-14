@@ -1,8 +1,9 @@
 name: Branch Protection for Repo
 
 on:
-#  push:
-    branches: [ main ]
+  push:
+    paths:
+        - Banch-Protection-for-Repo.csv
 
 env:
   REVIEWER_COUNT: 1
