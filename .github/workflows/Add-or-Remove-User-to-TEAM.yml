@@ -1,9 +1,10 @@
 
-name: add user to team
+name: Add or Remove User to TEAM
 
 on:
-#  push:
-    branches: [ main ]
+  push:
+    paths:
+    - Add-or-Remove-User-to-TEAM.csv
     
 env:
 #  TEAM_NAME: "${{ github.event.inputs.repo-name }}"
