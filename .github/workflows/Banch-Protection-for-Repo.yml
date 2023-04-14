@@ -36,11 +36,11 @@ jobs:
               }, 
               "restrictions": null
               }'             
-            done < <(cat repos.csv)
+            done < <(cat Banch-Protection-for-Repo.csv)
 
             
       - name: Upload CSV artifact
         uses: actions/upload-artifact@v2
         with:
           name: repos-csv
-          path: repos.csv
+          path: Banch-Protection-for-Repo.csv
