@@ -1,8 +1,9 @@
 name: Add or Remove User to Org
 
 on:
-#  push:
-    branches: [ main ]
+  push:
+    paths:
+        - :Add-or-Remove-User-to-ORG.csv
     
 env:
   ORG_NAME: "${{ secrets.ORGANIZATION }}"
