@@ -2,7 +2,7 @@
 name: User to Repo
 
 on:
-  push:
+#  push:
     branches: [ main ]
     
 env:
