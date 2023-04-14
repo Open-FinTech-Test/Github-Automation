@@ -2,7 +2,7 @@
 name: add user to team
 
 on:
-  push:
+#  push:
     branches: [ main ]
     
 env:
