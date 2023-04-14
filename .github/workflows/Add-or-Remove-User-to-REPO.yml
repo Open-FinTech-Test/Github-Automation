@@ -1,9 +1,10 @@
 
-name: User to Repo
+name: Add or Remove User to REPO
 
 on:
-#  push:
-    branches: [ main ]
+  push:
+    paths:
+        - Add-or-Remove-User-to-REPO.csv
     
 env:
 #  REPO_NAME: "${{ github.event.inputs.repo-name }}"
