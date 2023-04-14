@@ -1,7 +1,7 @@
 name: Branch Protection for Repo
 
 on:
-  push:
+#  push:
     branches: [ main ]
 
 env:
