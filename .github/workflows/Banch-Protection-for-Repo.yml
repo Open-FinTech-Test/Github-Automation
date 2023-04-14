@@ -1,0 +1,46 @@
+name: Branch Protection for Repo
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  REVIEWER_COUNT: 1
+  ORG_NAME: "${{ secrets.ORGANIZATION }}"
+
+jobs:
+  protect-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+    
+      - name: Branch protection
+        run: |     
+            while IFS=',' read -r REPO_NAME; do
+              echo "Repo: $REPO_NAME"
+              echo "url: https://api.github.com/repos/${{ env.ORG_NAME }}/$REPO_NAME/branches/main/protection"
+
+              curl --location --request PUT "https://api.github.com/repos/${{ env.ORG_NAME }}/$REPO_NAME/branches/main/protection" \
+              --header "Accept: application/vnd.github.luke-cage-preview+json" \
+              --header "Authorization: token ${{ secrets.ORG_ADMIN_TOKEN }}" \
+              --header "Content-Type: application/json" \
+              --data-raw '{
+              "required_status_checks": null, 
+              "enforce_admins": true, 
+              "required_pull_request_reviews": 
+              {
+                "dismiss_stale_reviews": true,
+                "require_code_owner_reviews": true,
+                "required_approving_review_count": ${{env.REVIEWER_COUNT}}
+              }, 
+              "restrictions": null
+              }'             
+            done < <(cat repos.csv)
+
+            
+      - name: Upload CSV artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: repos-csv
+          path: repos.csv

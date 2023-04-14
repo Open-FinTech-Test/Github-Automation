@@ -1,0 +1,44 @@
+name: REPO to a TEAM
+on:
+  push:
+    branches:
+      - main
+env:
+  ORG_NAME: ${{ secrets.ORGANIZATION }}
+jobs:
+  assign-users:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Assign or remove REPO to a TEAM
+        run: >
+          IFS=',' read -r ACTION  < <(head -n 1 repoteam.csv)
+
+          echo "Action: $ACTION"          
+
+          if [ $ACTION == "add-repo" ]; then
+            while IFS=',' read -r REPO_NAME TEAM_SLUG; do
+              echo "repoyude per: $REPO_NAME"
+              echo "teaminteper: $TEAM_SLUG"
+              
+              curl -X PUT -H "Authorization: token ${{ secrets.ORG_ADMIN_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3+json" \
+               https://api.github.com/orgs/${{ env.ORG_NAME }}/teams/$TEAM_SLUG/repos/${{ env.ORG_NAME }}/$REPO_NAME
+            done < <(tail -n +2 repoteam.csv)
+
+            
+          elif [ $ACTION == "remove-repo" ]; then
+            while IFS=',' read -r REPO_NAME TEAM_SLUG; do
+              curl -X DELETE -H "Authorization: token ${{ secrets.ORG_ADMIN_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3+json" \
+               https://api.github.com/orgs/${{ env.ORG_NAME }}/teams/$TEAM_SLUG/repos/${{ env.ORG_NAME }}/$REPO_NAME            
+            done < <(tail -n +2 repoteam.csv)  
+
+            
+          fi
+      - name: Upload CSV artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: repo-team-csv
+          path: repoteam.csv

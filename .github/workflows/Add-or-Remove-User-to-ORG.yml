@@ -1,0 +1,53 @@
+name: Add or Remove User to Org
+
+on:
+  push:
+    branches: [ main ]
+    
+env:
+  ORG_NAME: "${{ secrets.ORGANIZATION }}"
+  
+jobs:
+  user-to-org:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Assign or remove users to ORG 
+        run: |
+          IFS=',' read -r ACTION ORG_NAME < <(head -n 1 users.csv)
+          echo "Action: $ACTION"
+          echo "Org name: $ORG_NAME"
+          
+          if [ $ACTION == "add-user" ]; then
+            while IFS=',' read -r USERNAME ROLE || [ -n "$USERNAME" ]; do
+              if [ -z "$ROLE" ]; then
+                ROLE="member"
+              fi
+              echo "Username: $USERNAME"
+              echo "Role: $ROLE"
+
+              curl -X PUT \
+              -H "Accept: application/vnd.github.v3+json" \
+              -H "Authorization: Bearer ${{ secrets.ORG_ADMIN_TOKEN }}" \
+              "https://api.github.com/orgs/$ORG_NAME/memberships/$USERNAME" \
+              --data '{"role": "'$ROLE'"}'
+            done < <(tail -n +2 users.csv)
+            
+          elif [ $ACTION == "remove-user" ]; then
+           while IFS=',' read -r USERNAME ROLE || [ -n "$USERNAME" ]; do
+            curl -X DELETE \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: Bearer ${{ secrets.ORG_ADMIN_TOKEN }}" \
+            "https://api.github.com/orgs/$ORG_NAME/members/$USERNAME"
+           done < <(tail -n +2 users.csv)  
+            
+          fi
+          
+      - name: Upload CSV artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: user-roles-csv
+          path: users.csv

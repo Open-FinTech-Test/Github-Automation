@@ -1,0 +1,56 @@
+
+name: User to Repo
+
+on:
+  push:
+    branches: [ main ]
+    
+env:
+#  REPO_NAME: "${{ github.event.inputs.repo-name }}"
+  ORG_NAME: "${{ secrets.ORGANIZATION }}"
+#  ACTION: "action"
+  
+jobs:
+  assign-users:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Assign or remove users to REPO
+        run: |
+          IFS=',' read -r ACTION REPO_NAME < <(head -n 1 users.csv)
+          echo "Action: $ACTION"
+          echo "Repo name: $REPO_NAME"
+          
+          if [ $ACTION == "add-user" ]; then
+            while IFS=',' read -r USERNAME ROLE || [ -n "$USERNAME" ]; do
+              if [ -z "$ROLE" ]; then
+                ROLE="write"
+              fi
+              echo "Username: $USERNAME"
+              echo "Role: $ROLE"
+              echo "https://api.github.com/repos/${{ env.ORG_NAME }}/$REPO_NAME/collaborators/$USERNAME"
+              curl -H "Authorization: token ${{ secrets.ORG_ADMIN_TOKEN }}" \
+                -H "Accept: application/vnd.github.v3+json" \
+                -X PUT \
+                -d '{"permission":"'$ROLE'"}' \
+                "https://api.github.com/repos/${{ env.ORG_NAME }}/$REPO_NAME/collaborators/$USERNAME"
+            done < <(tail -n +2 users.csv)
+            
+          elif [ $ACTION == "remove-user" ]; then
+           while IFS=',' read -r USERNAME ROLE || [ -n "$USERNAME" ]; do
+              curl -i -H "Authorization: token ${{ secrets.ORG_ADMIN_TOKEN }}" -X DELETE "https://api.github.com/repos/${{ env.ORG_NAME }}/$REPO_NAME/collaborators/$USERNAME"
+            done < <(tail -n +2 users.csv)  
+            
+          fi
+          
+      - name: Upload CSV artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: user-roles-csv
+          path: users.csv
+          
+        
+
