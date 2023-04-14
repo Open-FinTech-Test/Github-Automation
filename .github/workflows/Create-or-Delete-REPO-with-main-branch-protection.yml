@@ -1,8 +1,9 @@
-name: Create Repo With Readme And Protection
+name: Create or Delete REPO with main branch protection
 
 on:
-#  push:
-    branches: [ main ]
+  push:
+    paths:
+        - Create-or-Delete-REPO-with-main-branch-protection.csv
 
 env:
   REVIEWER_COUNT: 1
