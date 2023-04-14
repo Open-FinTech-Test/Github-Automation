@@ -1,4 +1,4 @@
-name: REPO to a TEAM
+name: Add or Remove REPO to TEAM
 on:
   push:
     paths:
