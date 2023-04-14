@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Assign or remove REPO to a TEAM
         run: >
-          IFS=',' read -r ACTION  < <(head -n 1 repoteam.csv)
+          IFS=',' read -r ACTION  < <(head -n 1 Add-or-Remove-REPO-to-TEAM.csv)
 
           echo "Action: $ACTION"          
 
@@ -25,7 +25,7 @@ jobs:
               curl -X PUT -H "Authorization: token ${{ secrets.ORG_ADMIN_TOKEN }}" \
                -H "Accept: application/vnd.github.v3+json" \
                https://api.github.com/orgs/${{ env.ORG_NAME }}/teams/$TEAM_SLUG/repos/${{ env.ORG_NAME }}/$REPO_NAME
-            done < <(tail -n +2 repoteam.csv)
+            done < <(tail -n +2 Add-or-Remove-REPO-to-TEAM.csv)
 
             
           elif [ $ACTION == "remove-repo" ]; then
@@ -33,7 +33,7 @@ jobs:
               curl -X DELETE -H "Authorization: token ${{ secrets.ORG_ADMIN_TOKEN }}" \
                -H "Accept: application/vnd.github.v3+json" \
                https://api.github.com/orgs/${{ env.ORG_NAME }}/teams/$TEAM_SLUG/repos/${{ env.ORG_NAME }}/$REPO_NAME            
-            done < <(tail -n +2 repoteam.csv)  
+            done < <(tail -n +2 Add-or-Remove-REPO-to-TEAM.csv)  
 
             
           fi
