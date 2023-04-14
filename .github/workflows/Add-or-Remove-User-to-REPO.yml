@@ -20,7 +20,7 @@ jobs:
 
       - name: Assign or remove users to REPO
         run: |
-          IFS=',' read -r ACTION REPO_NAME < <(head -n 1 users.csv)
+          IFS=',' read -r ACTION REPO_NAME < <(head -n 1 Add-or-Remove-User-to-REPO.csv)
           echo "Action: $ACTION"
           echo "Repo name: $REPO_NAME"
           
@@ -37,12 +37,12 @@ jobs:
                 -X PUT \
                 -d '{"permission":"'$ROLE'"}' \
                 "https://api.github.com/repos/${{ env.ORG_NAME }}/$REPO_NAME/collaborators/$USERNAME"
-            done < <(tail -n +2 users.csv)
+            done < <(tail -n +2 Add-or-Remove-User-to-REPO.csv)
             
           elif [ $ACTION == "remove-user" ]; then
            while IFS=',' read -r USERNAME ROLE || [ -n "$USERNAME" ]; do
               curl -i -H "Authorization: token ${{ secrets.ORG_ADMIN_TOKEN }}" -X DELETE "https://api.github.com/repos/${{ env.ORG_NAME }}/$REPO_NAME/collaborators/$USERNAME"
-            done < <(tail -n +2 users.csv)  
+            done < <(tail -n +2 Add-or-Remove-User-to-REPO.csv)  
             
           fi
           
@@ -50,7 +50,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: user-roles-csv
-          path: users.csv
+          path: Add-or-Remove-User-to-REPO.csv
           
         
 
